@@ -2,3 +2,4 @@
 .idea
 minio-data
 *#
+pgdata/*
