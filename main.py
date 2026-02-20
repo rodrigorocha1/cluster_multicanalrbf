@@ -3,7 +3,7 @@ import os
 
 from datetime import datetime
 from src.contexto.contexto import Contexto
-from src.corrente_pipeline_comentarios.obter_lista_comentarios_corrente import ObterListaComentariosCorrente
+from src.corrente_pipeline_comentarios.obter_lista_canais_corrente import ObterListaComentariosCorrente
 from src.corrente_pipeline_comentarios.obter_ultima_data_publicacao_corrente import ObterUltimaDataPublicacaoCorrente
 from src.servicos.api_youtube.api_youtube import YoutubeAPI
 
