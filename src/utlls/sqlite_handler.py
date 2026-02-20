@@ -9,6 +9,7 @@ class SQLiteHandler(logging.Handler):
 
     def __init__(self, db_path: str):
         super().__init__()
+        print(db_path)
         self._conn: Optional[sqlite3.Connection] = sqlite3.connect(
             db_path,
             check_same_thread=False

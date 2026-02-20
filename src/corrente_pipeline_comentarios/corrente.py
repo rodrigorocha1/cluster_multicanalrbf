@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from src.contexto.contexto import Contexto
-from src.servicos.config.configuracao_log import logger
+from src.utlls.log_sqlite import logger
 
 
 class Corrente(ABC):

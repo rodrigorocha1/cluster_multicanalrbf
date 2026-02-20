@@ -55,6 +55,12 @@ class YoutubeAPI:
             )
 
             response = request.execute()
+            logger.info(f'Sucesso ao recuperar o vídeo do canal {id_canal}', extra={
+                "descricao": "Consulta canal YouTube",
+                "url": 'url_canal',
+                "codigo": 200,
+                'requisicao': response
+            })
 
             for item in response['items']:
                 video_id = item['id']['videoId']
@@ -126,15 +132,3 @@ class YoutubeAPI:
             if not next_page_token:
                 break
 
-
-if __name__ == '__main__':
-    youtube_api = YoutubeAPI()
-
-    data_inicio = datetime(2026, 2, 19, tzinfo=timezone.utc)
-    print(data_inicio)
-
-    # id_canal, _ = youtube_api.obter_id_canal('@jogatinaepica')
-    # print(id_canal)
-    # for video in youtube_api.obter_video_por_data(id_canal=id_canal, data_inicio=data_inicio):
-    #     print(video)
-    #     break
