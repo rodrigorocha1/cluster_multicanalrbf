@@ -26,6 +26,7 @@ class ObterListaVideosCorrente(Corrente):
             logger.info(f'Video {id_video} já foi inserido')
             return True
         logger.info(f'Video {id_video}  inserido')
+
         return False
 
     def __inserir_lista_videos(self, lista_id_videos: List[Generator[tuple[str, str], None, None]]):
@@ -40,6 +41,8 @@ class ObterListaVideosCorrente(Corrente):
                 )
 
     def executar_processo(self, contexto: Contexto) -> bool:
+        if contexto.data_publicacao is None:
+            raise ValueError("data_publicacao não pode ser None neste estágio do pipeline")
         lista_id_videos = [
             self.__servico_youtube.obter_video_por_data(id_canal=id_canal, data_inicio=contexto.data_publicacao) for
             id_canal in

@@ -26,8 +26,16 @@ class ObterUltimaDataPublicacaoCorrente(Corrente):
                 )
 
                 resultado: Optional[tuple[str]] = cursor.fetchone()
-                data_publicacao = datetime.strptime(resultado[0], "%Y-%m-%d %H:%M:%S") \
+
+                if resultado is None:
+                    return False
+
+                data_publicacao = (
+                    datetime.strptime(resultado[0], "%Y-%m-%d %H:%M:%S")
                     .replace(tzinfo=timezone.utc)
+                )
+
+                contexto.data_publicacao = data_publicacao
 
 
 
