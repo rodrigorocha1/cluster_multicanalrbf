@@ -1,35 +1,27 @@
-from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, Generator
+from typing import Dict, Generator, Protocol, Tuple, Optional
 
 
-class IApiYoutube(ABC):
+class IApiYoutube(Protocol):
 
-    @abstractmethod
-    def obter_id_canal(self, id_canal):
-        pass
+    def obter_id_canal(self, id_canal: str) -> Optional[Tuple[str, str]]:
+        ...
 
-    @abstractmethod
-    def obter_video_por_data(self, id_canal: str, data_inicio: datetime):
-        pass
+    def obter_video_por_data(
+            self,
+            id_canal: str,
+            data_inicio: datetime
+    ) -> Generator[Tuple[str, str], None, None]:
+        ...
 
-    @abstractmethod
-    def obter_comentarios_youtube(self, id_video: str) -> Generator[Dict, None, None]:
-        """
-        Método para obter comentários de um vídeo do youtube
-        :param id_video: id do vídeo
-        :type id_video: str
-        :return: Gerador dos comentários
-        :rtype: Generator[Dict, None, None]
-        """
-        pass
+    def obter_comentarios_youtube(
+            self,
+            id_video: str
+    ) -> Generator[Dict, None, None]:
+        ...
 
-    @abstractmethod
-    def obter_resposta_comentarios(self, id_comentario: str) -> Generator[Dict, None, None]:
-        """
-        Método para obter a resposta do comentários
-        :param id_comentario: id do comentários
-        :type id_comentario: str
-        :return: Gerador da resposta do comentários
-        :rtype: str
-        """
+    def obter_resposta_comentarios(
+            self,
+            id_comentario: str
+    ) -> Generator[Dict, None, None]:
+        ...

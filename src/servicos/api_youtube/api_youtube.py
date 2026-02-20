@@ -3,16 +3,15 @@ from typing import Generator, Dict
 
 from googleapiclient.discovery import build  # type: ignore
 
-from src.servicos.api_youtube.iapi_youtube import IApiYoutube
 from src.servicos.config.config import Config
 
 
-class YoutubeAPI(IApiYoutube):
+class YoutubeAPI:
 
     def __init__(self):
         self.__youtube = build('youtube', 'v3', developerKey=Config.CHAVE_API_YOUTUBE)
 
-    def obter_id_canal(self, id_canal):
+    def obter_id_canal(self, id_canal: str):
         request = self.__youtube.search().list(
             part="snippet",
             q=id_canal,
@@ -109,7 +108,7 @@ if __name__ == '__main__':
 
     data_inicio = datetime(2026, 2, 19, tzinfo=timezone.utc)
 
-    id_canal , _ = youtube_api.obter_id_canal('@jogatinaepica')
+    id_canal, _ = youtube_api.obter_id_canal('@jogatinaepica')
     print(id_canal)
     for video in youtube_api.obter_video_por_data(id_canal=id_canal, data_inicio=data_inicio):
         print(video)
