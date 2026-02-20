@@ -15,4 +15,3 @@ class Contexto:
     dataframe_original: pd.DataFrame = field(default_factory=pd.DataFrame)
     lista_video: List[Generator[tuple[str, str], None, None]] = field(default_factory=list)
     lista_canais: List[str] = field(default_factory=list)
-
