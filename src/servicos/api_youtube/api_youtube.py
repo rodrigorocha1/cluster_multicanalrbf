@@ -4,6 +4,7 @@ from typing import Generator, Dict
 from googleapiclient.discovery import build  # type: ignore
 
 from src.servicos.config.config import Config
+from src.utlls.log_sqlite import logger
 
 
 class YoutubeAPI:
@@ -12,16 +13,32 @@ class YoutubeAPI:
         self.__youtube = build('youtube', 'v3', developerKey=Config.CHAVE_API_YOUTUBE)
 
     def obter_id_canal(self, id_canal: str):
-        request = self.__youtube.search().list(
-            part="snippet",
-            q=id_canal,
-            type="channel",
-            maxResults=1
-        )
-        response = request.execute()
-        if 'items' in response and len(response['items']) > 0:
-            return response['items'][0]['id']['channelId'], response['items'][0]['snippet']['title']
-        return None
+        try:
+            request = self.__youtube.search().list(
+                part="snippet",
+                q=id_canal,
+                type="channel",
+                maxResults=1
+            )
+
+            response = request.execute()
+            url_canal = f"https://www.youtube.com/channel/{id_canal}"
+
+            logger.info(f'Sucesso ao recuperar o id do canal {id_canal}', extra={
+                "descricao": "Consulta canal YouTube",
+                "url": url_canal,
+                "codigo": 200,
+                'requisicao': response
+            })
+            if 'items' in response and len(response['items']) > 0:
+                return response['items'][0]['id']['channelId'], response['items'][0]['snippet']['title']
+            return None
+        except Exception as e:
+            logger.error(f'Erro ao consultar id do canal {id_canal}', extra={
+                'exception': e,
+                'message': 'evento de ero'
+            })
+            return None
 
     def obter_video_por_data(self, id_canal: str, data_inicio: datetime):
         data_inicio_string = data_inicio.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -60,17 +77,24 @@ class YoutubeAPI:
         """
         next_page_token = None
         while True:
-            request = self.__youtube.commentThreads().list(
-                part="snippet",
-                videoId=id_video,
-                maxResults=100,
-                pageToken=next_page_token,
-                textFormat="plainText"
-            )
-            response = request.execute()
-            yield from response["items"]
-            next_page_token = response.get("nextPageToken")
-            if not next_page_token:
+            try:
+                request = self.__youtube.commentThreads().list(
+                    part="snippet",
+                    videoId=id_video,
+                    maxResults=100,
+                    pageToken=next_page_token,
+                    textFormat="plainText"
+                )
+                response = request.execute()
+                yield from response["items"]
+                next_page_token = response.get("nextPageToken")
+                if not next_page_token:
+                    break
+            except Exception as e:
+                logger.error('erro ao recuperar_comentarios', extra={
+                    'exception': e,
+                    'message': 'evento de ero'
+                })
                 break
 
     def obter_resposta_comentarios(self, id_comentario: str) -> Generator[Dict, None, None]:
@@ -107,9 +131,10 @@ if __name__ == '__main__':
     youtube_api = YoutubeAPI()
 
     data_inicio = datetime(2026, 2, 19, tzinfo=timezone.utc)
+    print(data_inicio)
 
-    id_canal, _ = youtube_api.obter_id_canal('@jogatinaepica')
-    print(id_canal)
-    for video in youtube_api.obter_video_por_data(id_canal=id_canal, data_inicio=data_inicio):
-        print(video)
-        break
+    # id_canal, _ = youtube_api.obter_id_canal('@jogatinaepica')
+    # print(id_canal)
+    # for video in youtube_api.obter_video_por_data(id_canal=id_canal, data_inicio=data_inicio):
+    #     print(video)
+    #     break
