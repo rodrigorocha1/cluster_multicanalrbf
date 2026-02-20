@@ -4,12 +4,13 @@ from typing import List, Tuple, Optional
 
 
 class SQLiteDB:
-    def __init__(self, db_path: str = os.path.join(os.getcwd(), 'log', 'logs.db')):
+    def __init__(self, db_path: str = os.path.join(os.getcwd(), 'logs', 'logs.db')):
         self.db_path = db_path
         self.conn: Optional[sqlite3.Connection] = None
-        self.__conectar()
+        self._conectar()
 
-    def __conectar(self):
+    def _conectar(self):
+        print(self.db_path)
         self.conn = sqlite3.connect(self.db_path)
         self.conn.commit()
 
