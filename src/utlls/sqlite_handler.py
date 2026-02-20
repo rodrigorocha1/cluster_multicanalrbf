@@ -1,3 +1,4 @@
+import json
 import logging
 import sqlite3
 from datetime import datetime
@@ -27,6 +28,14 @@ class SQLiteHandler(logging.Handler):
                 else:
                     exception_text = logging.Formatter().formatException(record.exc_info)
 
+            requisicao = getattr(record, "requisicao", None)
+
+            # 🔥 SERIALIZAÇÃO SEGURA
+            if requisicao is not None and not isinstance(
+                    requisicao, (str, int, float, bytes)
+            ):
+                requisicao = json.dumps(requisicao, ensure_ascii=False)
+
             self._conn.execute(
                 """
                 INSERT INTO logs (
@@ -49,7 +58,7 @@ class SQLiteHandler(logging.Handler):
                 """,
                 (
                     record.created,
-                    datetime.now(),
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     record.levelname.upper(),
                     record.name,
                     record.module,
@@ -60,7 +69,7 @@ class SQLiteHandler(logging.Handler):
                     record.process,
                     record.thread,
                     getattr(record, "url", None),
-                    getattr(record, "requisicao", None),
+                    requisicao,
                     getattr(record, "codigo", None),
                 ),
             )
@@ -69,4 +78,3 @@ class SQLiteHandler(logging.Handler):
 
         except Exception:
             self.handleError(record)
-
