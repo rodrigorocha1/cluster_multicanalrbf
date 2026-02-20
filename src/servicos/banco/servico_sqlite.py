@@ -7,9 +7,9 @@ class SQLiteDB:
     def __init__(self, db_path: str = os.path.join(os.getcwd(), 'log', 'logs.db')):
         self.db_path = db_path
         self.conn: Optional[sqlite3.Connection] = None
-        self._conectar()
+        self.__conectar()
 
-    def _conectar(self):
+    def __conectar(self):
         self.conn = sqlite3.connect(self.db_path)
         self.conn.commit()
 
