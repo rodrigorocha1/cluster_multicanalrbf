@@ -35,8 +35,7 @@ class YoutubeAPI:
             return None
         except Exception as e:
             logger.error(f'Erro ao consultar id do canal {id_canal}', extra={
-                'exception': e,
-                'message': 'evento de ero'
+                'exception': e
             })
             return None
 
@@ -92,14 +91,20 @@ class YoutubeAPI:
                     textFormat="plainText"
                 )
                 response = request.execute()
+                logger.info(f'Sucesso ao comentarios o vídeo  {id_video}', extra={
+                    "descricao": "Consulta comentários YouTube",
+                    "url": 'url_canal',
+                    "codigo": 200,
+                    'requisicao': response
+                })
+
                 yield from response["items"]
                 next_page_token = response.get("nextPageToken")
                 if not next_page_token:
                     break
             except Exception as e:
                 logger.error('erro ao recuperar_comentarios', extra={
-                    'exception': e,
-                    'message': 'evento de ero'
+                    'exception': str(e)
                 })
                 break
 
@@ -116,19 +121,32 @@ class YoutubeAPI:
         next_page_token = None
 
         while True:
-            request = self.__youtube.comments().list(
-                part="snippet",
-                parentId=id_comentario,
-                maxResults=100,
-                textFormat="plainText",
-                pageToken=next_page_token  # plainText ou html
-            )
+            try:
+                request = self.__youtube.comments().list(
+                    part="snippet",
+                    parentId=id_comentario,
+                    maxResults=100,
+                    textFormat="plainText",
+                    pageToken=next_page_token  # plainText ou html
+                )
 
-            response = request.execute()
+                response = request.execute()
 
-            yield from response.get("items", [])
+                yield from response.get("items", [])
+                logger.info(f'Sucesso ao pegar a resposta do comentário   {id_comentario}', extra={
+                    "descricao": "Consulta comentários YouTube",
+                    "url": 'url_canal',
+                    "codigo": 200,
+                    'requisicao': response
+                })
 
-            next_page_token = response.get("nextPageToken")
-            if not next_page_token:
+                next_page_token = response.get("nextPageToken")
+                if not next_page_token:
+                    break
+
+            except Exception as e:
+                logger.error('erro ao recuperar_comentarios', extra={
+                    'exception': str(e)
+                })
                 break
 

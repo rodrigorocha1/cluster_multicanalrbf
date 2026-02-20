@@ -23,10 +23,15 @@ class ObterListaComentariosCorrente(Corrente):
             self.__servico_youtube.obter_video_por_data(id_canal=id_canal, data_inicio=data_publicacao) for id_canal in lista_id_canal
         ]
         return lista_id_videos
-
+    def __recuperar_comentarios(self, id_video: str):
+        comentarios = self.__servico_youtube.obter_comentarios_youtube(id_video)
+        yield from comentarios
     def executar_processo(self, contexto: Contexto) -> bool:
+
         lista_canais = self.__buscar_id_canais()
         for video in self.__buscar_video(lista_id_canal=lista_canais, data_publicacao=contexto.data_publicacao):
             for dado in video:
-                print(dado)
+                for comentario in self.__recuperar_comentarios(id_video=dado[0]):
+                    print(comentario)
+                    break
         return True
