@@ -1,8 +1,17 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Dict, Generator
 
 
 class IApiYoutube(ABC):
+
+    @abstractmethod
+    def obter_id_canal(self, id_canal):
+        pass
+
+    @abstractmethod
+    def obter_video_por_data(self, id_canal: str, data_inicio: datetime):
+        pass
 
     @abstractmethod
     def obter_comentarios_youtube(self, id_video: str) -> Generator[Dict, None, None]:
