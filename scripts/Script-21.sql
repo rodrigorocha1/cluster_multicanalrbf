@@ -35,3 +35,18 @@ DROP TABLE logs;
 select *
 FROM logs
 
+
+create TABLE  param_ultima_data_busca(
+	paramento text,
+	data_inicio DATETIME
+)
+
+
+select *
+FROM param_ultima_data_busca;
+
+
+INSERT INTO
+param_ultima_data_busca
+VALUES('ultima_data_publicacao_video','2026-02-19 21:39:01')
+
