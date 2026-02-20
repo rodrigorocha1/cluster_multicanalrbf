@@ -1,3 +1,5 @@
+from itertools import chain
+
 from src.contexto.contexto import Contexto
 from src.corrente_pipeline_comentarios.corrente import Corrente
 from src.servicos.api_youtube.iapi_youtube import IApiYoutube
@@ -17,6 +19,5 @@ class ObterListacomentariosCorrente(Corrente):
         pass
 
     def executar_processo(self, contexto: Contexto) -> bool:
-        a = self.__buscar_videos_antigos()
-        b =
+
         return True

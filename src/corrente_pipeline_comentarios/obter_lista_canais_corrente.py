@@ -5,7 +5,7 @@ from src.corrente_pipeline_comentarios.corrente import Corrente
 from src.servicos.api_youtube.iapi_youtube import IApiYoutube
 
 
-class ObterListCanaisCorrente(Corrente):
+class ObterListaCanaisCorrente(Corrente):
 
     def __init__(self, lista_canais: List[str], servico_youtube: IApiYoutube):
         super().__init__()
@@ -20,6 +20,7 @@ class ObterListCanaisCorrente(Corrente):
 
     def executar_processo(self, contexto: Contexto) -> bool:
         lista_canais = self.__buscar_id_canais()
+        print(lista_canais)
 
         contexto.lista_canais = lista_canais
 
