@@ -3,3 +3,4 @@
 minio-data
 *#
 pgdata/*
+/logs/logs.db
