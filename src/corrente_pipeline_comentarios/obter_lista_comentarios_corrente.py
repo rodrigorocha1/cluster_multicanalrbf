@@ -20,8 +20,6 @@ class ObterListacomentariosCorrente(Corrente):
             colunas='id_video'
 
         )
-        print(lista_id_video)
-        print(type(lista_id_video))
         return lista_id_video
 
     def executar_processo(self, contexto: Contexto) -> bool:
