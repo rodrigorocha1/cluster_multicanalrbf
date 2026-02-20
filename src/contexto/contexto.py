@@ -13,5 +13,4 @@ class Contexto:
     lista_id_comentarios: List[Tuple[str, ...]] = field(default_factory=list)
     gerador_resposta_comentarios: Iterable[Any] = field(default_factory=list)
     dataframe_original: pd.DataFrame = field(default_factory=pd.DataFrame)
-    lista_video: List[Generator[tuple[str, str], None, None]] = field(default_factory=list)
     lista_canais: List[str] = field(default_factory=list)
