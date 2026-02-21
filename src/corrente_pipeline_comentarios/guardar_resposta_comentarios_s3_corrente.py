@@ -24,7 +24,7 @@ class GuardarDadosYoutubeRespostaComentariosS3Corrente(Corrente):
 
         for dados in contexto.lista_req_resp_comentarios:
             for req_resposta_comentarios in dados[3]:
-                print(dados)
+
 
                 logger.info(f'Guardando json do canal {dados[0]}')
                 id_resposta_comentarios = req_resposta_comentarios['id']
