@@ -5,7 +5,6 @@ from src.contexto.contexto import Contexto
 from src.corrente_pipeline_comentarios.corrente import Corrente
 from src.servicos.api_youtube.iapi_youtube import IApiYoutube
 from src.servicos.banco.servico_sqlite import SQLiteDB
-from src.servicos.servico_s3.iservicos3 import Iservicos3
 from src.utlls.log_sqlite import logger
 
 
@@ -16,7 +15,6 @@ class ObterListaVideosCorrente(Corrente):
         self.__lista_canais = lista_canais
         self.__servico_youtube = servico_youtube
         self.__servico_banco = SQLiteDB()
-
 
     def __verificar_video_inserido(self, id_video: str) -> bool:
         lista_videos = self.__servico_banco.buscar(
@@ -52,5 +50,5 @@ class ObterListaVideosCorrente(Corrente):
         ]
         logger.info(f'Achou {len(lista_id_videos)} videos')
         self.__inserir_lista_videos(lista_id_videos)
-
+        self.__servico_banco.fechar_conexao()
         return True
