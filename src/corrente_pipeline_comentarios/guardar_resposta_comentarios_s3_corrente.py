@@ -41,7 +41,7 @@ class GuardarDadosYoutubeRespostaComentariosS3Corrente(Corrente):
                     logger.error(f'{e}')
                     logger.info(f'{id_comentario}  error atualizacao')
                     dataframe = pd.DataFrame()
-                print(dataframe)
+
                 if dataframe.empty:
                     logger.info(f'{id_comentario}  teve atualizacao')
                     caminho_arquivo = f"{self.__caminho_arquivo}/id_canal_{dados[0]}/id_video_{dados[1]}/id_comentario_{dados[2]}/resposta_comentarios.json"
