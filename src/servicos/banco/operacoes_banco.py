@@ -38,7 +38,7 @@ class OperacoesBancoDuckDb(IoperacoesBanco[pd.DataFrame, pd.DataFrame]):
 
     def guardar_dados(self, dados: pd.DataFrame):
         self.__con.register('df_temp', dados)
-        self.__con.execute(f'COPY df_temp TO "{self.__caminho_s3_prata}" (FORMAT CSV, HEADER TRUE)')
+        self.__con.execute(f'COPY df_temp TO "{self.__caminho_s3_prata}" (FORMAT CSV, HEADER TRUE,  DELIMITER ";")')
 
 
 if __name__ == '__main__':

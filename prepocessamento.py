@@ -12,7 +12,7 @@ base_original['texto_comentário_tratado'] = vetorizar_tratamento(base_original[
 
 
 tokens_list, entidades_list, comentarios_limpos, embeddings_list = tratamamento_spacy.executar_tratamento(
-    base_original['texto_comentario'].tolist()
+    base_original['texto_comentário_tratado'].tolist()
     )
 
 
