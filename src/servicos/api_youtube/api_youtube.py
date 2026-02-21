@@ -103,7 +103,7 @@ class YoutubeAPI:
                 if not next_page_token:
                     break
             except Exception as e:
-                logger.error('erro ao recuperar_comentarios', extra={
+                logger.error(f'erro ao recuperar_comentarios {e}', extra={
                     'exception': str(e)
                 })
                 break
