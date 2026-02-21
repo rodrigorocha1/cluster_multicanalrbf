@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS logs (
 CREATE INDEX IF NOT EXISTS idx_logs_data_registro
 ON logs (data_registro);
 
-DROP TABLE logs;
+DELETE FROM  logs;
 
 select *
 FROM logs
@@ -38,6 +38,8 @@ order by 3 DESC ;
 
 
 SELECT DATETIME('now', 'localtime', '-1 day');
+
+DELETE FROM logs;
 
 
 CREATE table videos(
