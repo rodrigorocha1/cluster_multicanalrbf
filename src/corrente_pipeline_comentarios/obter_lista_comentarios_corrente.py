@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import List, Tuple
 
 from src.contexto.contexto import Contexto
@@ -23,6 +24,10 @@ class ObterListacomentariosCorrente(Corrente):
         return lista_id_video
 
     def executar_processo(self, contexto: Contexto) -> bool:
-        for video in self.__buscar_videos():
-            print(video[0])
+        videos = map(lambda v: v[0], self.__buscar_videos())
+
+        comentarios = chain.from_iterable(
+            map(self.__servico_youtube.obter_comentarios_youtube, videos)
+        )
+        contexto.lista_id_comentarios = comentarios
         return True

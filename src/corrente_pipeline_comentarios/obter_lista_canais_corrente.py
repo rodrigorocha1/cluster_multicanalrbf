@@ -13,9 +13,19 @@ class ObterListaCanaisCorrente(Corrente):
         self.__servico_youtube = servico_youtube
 
     def __buscar_id_canais(self) -> List[str]:
-        lista_canais_resultado = [
-            self.__servico_youtube.obter_id_canal(canal)[0] for canal in self.__lista_canais
-        ]
+        lista_canais_resultado: List[str] = []
+
+        for canal in self.__lista_canais:
+            print(canal)
+            resultado = self.__servico_youtube.obter_id_canal(canal)
+            print(resultado)
+
+            if resultado is None:
+                continue
+
+            canal_id, _ = resultado
+            lista_canais_resultado.append(canal_id)
+
         return lista_canais_resultado
 
     def executar_processo(self, contexto: Contexto) -> bool:
