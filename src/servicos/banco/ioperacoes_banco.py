@@ -1,19 +1,24 @@
 from abc import ABC, abstractmethod
+from typing import TypeVar, Generic
 
-import pandas as pd
+# Define um tipo genérico T
+T = TypeVar("T")
+R = TypeVar("R")
 
 
-class IoperacoesBanco(ABC):
+class IoperacoesBanco(ABC, Generic[T, R]):
+    @abstractmethod
+    def consultar_dados(self, id_consulta: str, caminho_consulta: str) -> R:
+        """
+        Método para consultar registros.
+        Retorna um tipo genérico R.
+        """
+        pass
 
     @abstractmethod
-    def consultar_dados(self, id_consulta: str, caminho_consulta: str) -> pd.DataFrame:
+    def guardar_dados(self, dados: T):
         """
-        Método para consultar registro inseridos
-        :param id_consulta: id da consulta, chave
-        :type id_consulta: str
-        :param caminho_consulta: caminho do minio s3
-        :type caminho_consulta: str
-        :return: dataframe com os resultados
-        :rtype: pd.Dataframe
+        Método para guardar dados.
+        Aceita um tipo genérico T.
         """
         pass

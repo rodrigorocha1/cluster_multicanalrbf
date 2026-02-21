@@ -11,7 +11,7 @@ class IApiYoutube(Protocol):
             self,
             id_canal: str,
             data_inicio: datetime
-    ) -> Generator[Tuple[str, str], None, None]:
+    ) -> Generator[Dict, None, None]:
         ...
 
     def obter_comentarios_youtube(

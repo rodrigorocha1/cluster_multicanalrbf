@@ -1,11 +1,13 @@
 import duckdb
 import pandas as pd
-
-from src.servicos.banco.ioperacoes_banco import IoperacoesBanco
+from datetime import datetime
+from src.servicos.banco.ioperacoes_banco import IoperacoesBanco, T
 from src.servicos.config.config import Config
 
 
-class OperacoesBancoDuckDb(IoperacoesBanco):
+class OperacoesBancoDuckDb(IoperacoesBanco[pd.DataFrame, pd.DataFrame]):
+
+
 
     def __init__(self):
         self.__con = duckdb.connect()
@@ -19,6 +21,8 @@ class OperacoesBancoDuckDb(IoperacoesBanco):
                 SET s3_use_ssl=false;
                 SET s3_url_style='path';
             """)
+        self.__data_arquivo = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+        self.__caminho_s3_prata = f's3://extracao/prata/comentarios_youtube_prata_{self.__data_arquivo}.csv'
 
     def consultar_dados(self, id_consulta: str, caminho_consulta: str) -> pd.DataFrame:
         query = f"""
@@ -31,6 +35,10 @@ class OperacoesBancoDuckDb(IoperacoesBanco):
         result = self.__con.execute(query, [caminho_consulta])
         df = result.fetchdf()
         return df
+
+    def guardar_dados(self, dados: pd.DataFrame):
+        self.__con.register('df_temp', dados)
+        self.__con.execute(f'COPY df_temp TO "{self.__caminho_s3_prata}" (FORMAT CSV, HEADER TRUE)')
 
 
 if __name__ == '__main__':

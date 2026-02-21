@@ -1,5 +1,6 @@
 import json
-from typing import Dict, List
+import pickle
+from typing import Any, Dict, List, Union
 
 import boto3
 import pandas as pd
@@ -10,17 +11,9 @@ from src.servicos.config.config import Config as c
 from src.servicos.servico_s3.iservicos3 import Iservicos3
 
 pd.set_option("display.max_columns", None)
-
-# Não quebrar linha no meio
 pd.set_option("display.expand_frame_repr", False)
-
-# Aumentar largura do display
 pd.set_option("display.width", 200)
-
-# Mostrar texto completo (ou limite maior)
 pd.set_option("display.max_colwidth", 300)
-
-# Mostrar mais linhas
 pd.set_option("display.max_rows", 20)
 
 
@@ -38,14 +31,41 @@ class ServicoS3(Iservicos3):
             client_kwargs={"endpoint_url": c.MINIO_ENDPOINT},
         )
 
-    def guardar_dados(self, dados: Dict, caminho_arquivo: str) -> None:
+    def guardar_dados(self, dados: Any, caminho_arquivo: str, tipo: str = "json") -> None:
 
+        if tipo == "json":
+            self._guardar_json(dados, caminho_arquivo)
+        elif tipo == "dataframe":
+            self._guardar_dataframe(dados, caminho_arquivo)
+        elif tipo == "pickle":
+            self._guardar_pickle(dados, caminho_arquivo)
+        else:
+            raise ValueError(f"Tipo desconhecido: {tipo}. Use 'json', 'dataframe' ou 'pickle'.")
+
+    def _guardar_json(self, dados: Union[Dict, List], caminho_arquivo: str) -> None:
         linhas = self._obter_linhas_existentes(caminho_arquivo)
-
-        nova_linha = self._serializar_dados(dados)
+        nova_linha = json.dumps(dados, ensure_ascii=False)
         linhas.append(nova_linha)
+        self._salvar_linhas(caminho_arquivo, linhas, content_type="application/json")
 
-        self._salvar_linhas(caminho_arquivo, linhas)
+    def _guardar_dataframe(self, df: pd.DataFrame, caminho_arquivo: str) -> None:
+
+        csv_buffer = df.to_csv(index=False, encoding="utf-8")
+        self.__cliente_s3.put_object(
+            Bucket=c.MINIO_BUCKET_PLN,
+            Key=caminho_arquivo,
+            Body=csv_buffer.encode('utf-8'),
+            ContentType="text/csv"
+        )
+
+    def _guardar_pickle(self, obj: Any, caminho_arquivo: str) -> None:
+        pickle_bytes = pickle.dumps(obj)
+        self.__cliente_s3.put_object(
+            Bucket=c.MINIO_BUCKET_PLN,
+            Key=caminho_arquivo,
+            Body=pickle_bytes,
+            ContentType="application/octet-stream"
+        )
 
     @staticmethod
     def _criar_cliente():
@@ -64,26 +84,16 @@ class ServicoS3(Iservicos3):
                 Bucket=c.MINIO_BUCKET_PLN,
                 Key=caminho_arquivo
             )
-
             conteudo = obj['Body'].read().decode('utf-8')
-            return [
-                linha for linha in conteudo.splitlines()
-                if linha.strip()
-            ]
-
+            return [linha for linha in conteudo.splitlines() if linha.strip()]
         except self.__cliente_s3.exceptions.NoSuchKey:
             return []
 
-    @staticmethod
-    def _serializar_dados(dados: Dict) -> str:
-        return json.dumps(dados, ensure_ascii=False)
-
-    def _salvar_linhas(self, caminho_arquivo: str, linhas: List[str]) -> None:
+    def _salvar_linhas(self, caminho_arquivo: str, linhas: List[str], content_type="application/json") -> None:
         novo_conteudo = "\n".join(linhas)
-
         self.__cliente_s3.put_object(
             Bucket=c.MINIO_BUCKET_PLN,
             Key=caminho_arquivo,
             Body=novo_conteudo.encode('utf-8'),
-            ContentType="application/json"
+            ContentType=content_type
         )
