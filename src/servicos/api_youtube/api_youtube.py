@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Generator, Dict
 
 from googleapiclient.discovery import build  # type: ignore
@@ -24,7 +24,7 @@ class YoutubeAPI:
             response = request.execute()
             url_canal = f"https://www.youtube.com/channel/{id_canal}"
 
-            logger.info(f'Sucesso ao recuperar o id do canal {id_canal}', extra={
+            logger.info(f'Sucesso ao recuperar lista de videos do canal {id_canal}', extra={
                 "descricao": "Consulta canal YouTube",
                 "url": url_canal,
                 "codigo": 200,
@@ -43,6 +43,7 @@ class YoutubeAPI:
         data_inicio_string = data_inicio.strftime("%Y-%m-%dT%H:%M:%SZ")
         flag_token = True
         token = ''
+        print(data_inicio_string)
         while flag_token:
             request = self.__youtube.search().list(
                 part="snippet",
@@ -50,23 +51,23 @@ class YoutubeAPI:
                 order="date",
                 publishedAfter=data_inicio_string,
                 pageToken=token,
-                maxResults=50
+
             )
 
             response = request.execute()
+            print(response)
             logger.info(f'Sucesso ao recuperar o vídeo do canal {id_canal}', extra={
-                "descricao": "Consulta canal YouTube",
-                "url": 'url_canal',
+                "descricao": "Consulta vídeo YouTube",
+                "url": 'url Vídeo',
                 "codigo": 200,
                 'requisicao': response
             })
 
-            for item in response['items']:
-                video_id = item['id']['videoId']
-                video_title = item['snippet']['title']
-                yield video_id, video_title
-
             try:
+                for item in response['items']:
+                    video_id = item['id']['videoId']
+                    video_title = item['snippet']['title']
+                    yield video_id, video_title
                 token = response['nextPageToken']
                 flag_token = True
             except KeyError:
@@ -86,7 +87,7 @@ class YoutubeAPI:
                 request = self.__youtube.commentThreads().list(
                     part="snippet",
                     videoId=id_video,
-                    maxResults=100,
+
                     pageToken=next_page_token,
                     textFormat="plainText"
                 )
@@ -149,4 +150,3 @@ class YoutubeAPI:
                     'exception': str(e)
                 })
                 break
-
