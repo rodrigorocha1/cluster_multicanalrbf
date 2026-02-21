@@ -7,7 +7,7 @@ from src.corrente_pipeline_comentarios.corrente import Corrente
 from src.servicos.banco.ioperacoes_banco import IoperacoesBanco
 
 
-class TratamentoComentariosCorrente(Corrente):
+class CriacaoDataframeComentariosCompletoCorrente(Corrente):
 
     def __init__(self, operacoes_banco: IoperacoesBanco):
         super().__init__()
@@ -80,7 +80,7 @@ class TratamentoComentariosCorrente(Corrente):
             df_comentarios_final=df_comentarios,
             df_resposta_comentarios_final=df_resposta_comentarios
         )
-        self.__banco_analitico.guardar_dados(dataset_comentarios_tratado)
+        contexto.dataframe_prata = dataset_comentarios_tratado
 
 
         return True

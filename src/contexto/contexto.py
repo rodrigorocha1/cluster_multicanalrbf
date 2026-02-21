@@ -16,3 +16,4 @@ class Contexto:
     gerador_resposta_comentarios: Iterable[Any] = field(default_factory=list)
     dataframe_original: pd.DataFrame = field(default_factory=pd.DataFrame)
     lista_canais: List[str] = field(default_factory=list)
+    dataframe_prata: pd.DataFrame = field(default_factory=pd.DataFrame)

@@ -10,17 +10,11 @@ class TratamentoSpacy:
     def __gerar_tokens(
         self, comentarios: List[str]
     ) -> Tuple[List[List[Tuple[str, bool]]], List[str]]:
-        """
-        Método para gerar tokens
-        :param comentarios: comentários de vídeos steam
-        :type comentarios:  str
-        :return: tokens tratados
-        :rtype: Tuple[List[List[Tuple[str, bool]]], List[str]]
-        """
+    
         docs = self.__nlp.pipe(comentarios, batch_size=1000, n_process=1)
         tokens_resultado = []
         comentarios_limpos = []
-
+    
         for doc in docs:
             tokens_filtrados = [
                 (token.lemma_, token.is_punct)
@@ -28,13 +22,14 @@ class TratamentoSpacy:
                 if not token.is_stop
                    and not token.is_punct
                    and not token.like_num
+                   and not token.like_url
+                   and not token.text.startswith("@")
+                   and not token.text.startswith("#")
                    and len(token.lemma_) > 2
             ]
             tokens_resultado.append(tokens_filtrados)
-
-            # Gera comentário limpo unindo os lemmas filtrados
             comentarios_limpos.append(" ".join([lemma for lemma, _ in tokens_filtrados]))
-
+    
         return tokens_resultado, comentarios_limpos
 
     def __gerar_entidades(self, comentarios: List[str]) -> List[List[Tuple[str, str]]]:
