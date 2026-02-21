@@ -68,3 +68,4 @@ df_resposta_comentarios_final.rename(columns={
 #união dataframe
 
 df_comentarios_tratado_final = pd.concat([df_resposta_comentarios_final, df_comentarios_final])
+df_comentarios_tratado_final.to_csv('df_comentarios_tratado_final.csv', sep='|')
