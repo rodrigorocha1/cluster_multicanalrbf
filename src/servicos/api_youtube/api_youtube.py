@@ -43,7 +43,7 @@ class YoutubeAPI:
         data_inicio_string = data_inicio.strftime("%Y-%m-%dT%H:%M:%SZ")
         flag_token = True
         token = ''
-        print(data_inicio_string)
+
         while flag_token:
             request = self.__youtube.search().list(
                 part="snippet",
@@ -55,7 +55,7 @@ class YoutubeAPI:
             )
 
             response = request.execute()
-            print(response)
+
             logger.info(f'Sucesso ao recuperar o vídeo do canal {id_canal}', extra={
                 "descricao": "Consulta vídeo YouTube",
                 "url": 'url Vídeo',
@@ -64,10 +64,7 @@ class YoutubeAPI:
             })
 
             try:
-                for item in response['items']:
-                    video_id = item['id']['videoId']
-                    video_title = item['snippet']['title']
-                    yield video_id, video_title
+                yield from  response['items']
                 token = response['nextPageToken']
                 flag_token = True
             except KeyError:
