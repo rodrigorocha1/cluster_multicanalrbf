@@ -34,6 +34,16 @@ DROP TABLE logs;
 
 select *
 FROM logs
+order by 3 DESC ;
+
+
+SELECT DATETIME('now', 'localtime', '-1 day');
+
+
+CREATE table videos(
+	id_video text primary key,
+	titulo_video text 
+)
 
 
 create TABLE  param_ultima_data_busca(
@@ -41,6 +51,10 @@ create TABLE  param_ultima_data_busca(
 	data_inicio DATETIME
 )
 
+SELECT *
+FROM videos;
+
+truncate table videos
 
 select *
 FROM param_ultima_data_busca;
