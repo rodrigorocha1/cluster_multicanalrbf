@@ -40,9 +40,9 @@ df_comentarios_final.rename(
 caminho_consulta_resposta_comentarios  = f's3://extracao/youtube/bronze/resposta_comentarios_youtube/*/*/*/resposta_comentarios.json'
 dataframe_reposta_comentarios = obddb.consultar_dados('1=1', caminho_consulta_resposta_comentarios)
 df_snippet_resposta_comentarios = pd.json_normalize(
-    data=dataframe_reposta_comentarios[['snippet', 'id']].to_dict(orient='records'),
+    data=dataframe_reposta_comentarios[['snippet', 'id']].dropna(subset=['snippet']).to_dict(orient='records'),
     sep='_'
-    )
+)
 
 df_snippet_resposta_comentarios['id_comentario'] = df_snippet_resposta_comentarios['id'].str.split('.').str[1]
 
@@ -50,19 +50,20 @@ df_snippet_resposta_comentarios['id_comentario'] = df_snippet_resposta_comentari
 df_snippet_resposta_comentarios = df_snippet_resposta_comentarios[['snippet_channelId', 'snippet_parentId', 'id_comentario',  'snippet_textDisplay']]
 
 df_resposta_comentarios_final = pd.merge(
-    df_comentarios_final[['videoId', 'topLevelComment_id']], 
+    df_comentarios_final[['id_video', 'id_comentario']], 
     df_snippet_resposta_comentarios, 
-    left_on='topLevelComment_id',
+    left_on='id_comentario',
     right_on='snippet_parentId',
     how='inner'
     ) 
 
-df_resposta_comentarios_final = df_resposta_comentarios_final[['snippet_channelId', 'videoId', 'id_comentario', 'snippet_textDisplay']]
+df_resposta_comentarios_final = df_resposta_comentarios_final[['snippet_channelId', 'id_video', 'id_comentario_x', 'snippet_textDisplay']]
 
 df_resposta_comentarios_final.rename(columns={
     'snippet_channelId': 'id_canal',
     'videoId': 'id_video',
-    'snippet_textDisplay': 'texto_comentario'
+    'snippet_textDisplay': 'texto_comentario',
+    'id_comentario_x': 'id_comentario'
     }, inplace=True)
 
 #união dataframe
