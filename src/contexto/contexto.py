@@ -11,6 +11,7 @@ class Contexto:
     gerador_reviews_steam: Iterable[Any] = field(default_factory=list)
     gerador_comentarios_youtube: Iterable[Any] = field(default_factory=list)
     lista_req_comentarios: Iterable[Dict[str, Any]] = field(default_factory=list)
+    lista_req_resp_comentarios: List[Tuple[str, str, str, Iterable[Dict[str, Any]]]] = field(default_factory=list)
     lista_id_comentarios: List[Tuple[str, str, str]] = field(default_factory=list)
     gerador_resposta_comentarios: Iterable[Any] = field(default_factory=list)
     dataframe_original: pd.DataFrame = field(default_factory=pd.DataFrame)
