@@ -24,7 +24,7 @@ class ObterListacomentariosCorrente(Corrente):
         return lista_id_video
 
     def executar_processo(self, contexto: Contexto) -> bool:
-        videos = map(lambda v: v[0], self.__buscar_videos())
+        videos = map(lambda v: v[0], contexto.)
 
         comentarios = chain.from_iterable(
             map(self.__servico_youtube.obter_comentarios_youtube, videos)
