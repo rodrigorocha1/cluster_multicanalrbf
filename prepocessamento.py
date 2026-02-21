@@ -1,0 +1,23 @@
+import pandas as pd
+import spacy
+import numpy as np
+from src.servicos.estrategia_tratamento.tratamento_simples import TratamentoSimples
+from src.servicos.estrategia_tratamento.tratamento_spacy import TratamentoSpacy
+tratamento_simples = TratamentoSimples()
+tratamamento_spacy = TratamentoSpacy()
+
+base_original = pd.read_csv('df_comentarios_tratado_final.csv', sep='|')
+
+vetorizar_tratamento = np.vectorize(tratamento_simples.executar_tratamento)
+base_original['texto_comentário_tratado'] = vetorizar_tratamento(base_original['texto_comentario'])
+
+# Executa tratamento SpaCy para todos os comentários de uma vez
+tokens_list, entidades_list, comentarios_limpos, embeddings_list = tratamento_spacy.executar_tratamento(
+    base_original['texto_comentario'].tolist()
+)
+
+# Cria as colunas diretamente
+base_original['tokens'] = tokens_list
+base_original['entidades'] = entidades_list
+base_original['comentario_limpo'] = comentarios_limpos
+base_original['embeddings'] = embeddings_list
