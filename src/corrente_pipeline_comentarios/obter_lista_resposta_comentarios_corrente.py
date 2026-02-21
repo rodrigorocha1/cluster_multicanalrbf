@@ -1,5 +1,4 @@
 from itertools import chain
-from typing import List, Tuple
 
 from src.contexto.contexto import Contexto
 from src.corrente_pipeline_comentarios.corrente import Corrente
@@ -7,27 +6,24 @@ from src.servicos.api_youtube.iapi_youtube import IApiYoutube
 from src.servicos.banco.servico_sqlite import SQLiteDB
 
 
-class ObterListacomentariosCorrente(Corrente):
+class ObterListaRespostaComentariosCorrente(Corrente):
 
     def __init__(self, servico_youtube: IApiYoutube):
         super().__init__()
         self.__servico_banco = SQLiteDB()
         self.__servico_youtube = servico_youtube
 
-    def __buscar_videos(self) -> List[Tuple[str, ...]]:
-        lista_id_video = self.__servico_banco.buscar(
-            nome_tabela='videos',
-            where='1 = 1',
-            colunas='id_video'
-
-        )
-        return lista_id_video
-
     def executar_processo(self, contexto: Contexto) -> bool:
-        videos = map(lambda v: v[0], contexto.)
 
-        comentarios = chain.from_iterable(
-            map(self.__servico_youtube.obter_comentarios_youtube, videos)
-        )
-        contexto.lista_req_comentarios = comentarios
+        for dados_resposta_comentarios in contexto.lista_id_comentarios:
+
+            id_canal = dados_resposta_comentarios[0]
+            id_video = dados_resposta_comentarios[1]
+            id_comentario = dados_resposta_comentarios[2]
+            req_resp_comentarios = self.__servico_youtube.obter_resposta_comentarios(id_comentario)
+            contexto.lista_req_resp_comentarios.append((id_canal, id_video, id_comentario, req_resp_comentarios))
+
+
+
+
         return True

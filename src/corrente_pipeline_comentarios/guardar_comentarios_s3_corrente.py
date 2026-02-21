@@ -20,7 +20,7 @@ class GuardarComentariosS3Corrente(Corrente):
         self.__servico_youtube = servico_youtube
         self.__servico_banco_analitico = servico_banco_analitico
         self.__servico_s3 = servico_s3
-        self.__caminho_arquivo = f'youtube/bronze/resposta_comentarios_youtube'
+        self.__caminho_arquivo = f'youtube/bronze/comentarios_youtube'
 
     def __buscar_videos(self) -> List[Tuple[str, ...]]:
         lista_id_video = self.__servico_banco.buscar(
@@ -39,7 +39,7 @@ class GuardarComentariosS3Corrente(Corrente):
             id_comentario = comentario['id']
             data_atualizacao_api = comentario['snippet']['topLevelComment']['snippet']['updatedAt']
             condicao = f"id = '{id_comentario}' AND snippet.topLevelComment.snippet.updatedAt = '{data_atualizacao_api}'"
-            caminho_base = f"{self.__caminho_arquivo}_id_canal_{id_canal}/id_video_{id_video}/comentarios.json"
+            caminho_base = f"{self.__caminho_arquivo}/*/*/comentarios.json"
             caminho_consulta = f"s3://extracao/{caminho_base}"
             try:
                 dataframe = self.__servico_banco_analitico.consultar_dados(caminho_consulta=caminho_consulta,
@@ -49,7 +49,7 @@ class GuardarComentariosS3Corrente(Corrente):
             if dataframe.empty:
                 logger.info(f'Guardando resposta  comentários: {id_comentario} ')
 
-                caminho_completo = f"{self.__caminho_arquivo}_id_canal_{id_canal}/id_video_{id_video}/comentarios.json"
+                caminho_completo = f"{self.__caminho_arquivo}/id_canal_{id_canal}/id_video_{id_video}/comentarios.json"
                 self.__servico_s3.guardar_dados(comentario, caminho_completo)
             else:
                 logger.info(f'Resposta comentários: {id_comentario} não teve atualizacao')
