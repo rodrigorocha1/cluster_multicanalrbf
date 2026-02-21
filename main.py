@@ -19,12 +19,21 @@ from src.servicos.servico_s3.sevicos3 import ServicoS3
 contexto = Contexto(data_publicacao=datetime.now())
 caminho_banco = os.path.join(os.getcwd(), 'logs', 'logs.db')
 lista_canais = [
-    '@jogatinaepica'
+    # '@jogatinaepica',
+    # '@CKXgameplay',
+    # '@PalaDinXPG',
+    # '@CanaldoVoid',
+    # '@ChratosGameplay',
+    # '@LivesdoChratos',
+    # '@cmdrleonerd',
+    '@BarbosaCities'
+
 ]
 servico_youtube = YoutubeAPI()
 servico_s3 = ServicoS3()
 servico_banco_analitico = OperacoesBancoDuckDb()
-p1 = ObterUltimaDataPublicacaoCorrente(caminho_banco=caminho_banco)
+p1 = ObterUltimaDataPublicacaoCorrente(
+    caminho_banco=caminho_banco)
 p2 = ObterListaCanaisCorrente(
     lista_canais=lista_canais,
     servico_youtube=servico_youtube
@@ -56,4 +65,4 @@ p1.set_proxima_corrente(p2) \
     .set_proxima_corrente(p6) \
     .set_proxima_corrente(p7) \
     .set_proxima_corrente(p8)
-p8.corrente(contexto=contexto)
+p1.corrente(contexto=contexto)
