@@ -16,7 +16,7 @@ con.execute(f"""
 """)
 
 # Caminho do CSV no MinIO
-s3_path = f"s3://extracao/prata/comentarios_youtube_prata_2026_02_21_22_09_20.csv"
+s3_path = f"s3://extracao/prata/comentarios_youtube_prata_2026_02_21_22_15_46.csv"
 
 # Ler CSV direto do MinIO para pandas DataFrame
 df = con.execute(f"""
