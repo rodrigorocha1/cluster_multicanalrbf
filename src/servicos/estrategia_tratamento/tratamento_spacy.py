@@ -28,7 +28,7 @@ class TratamentoSpacy:
                    and len(token.lemma_) > 2
             ]
             tokens_resultado.append(tokens_filtrados)
-            comentarios_limpos.append(" ".join([lemma for lemma, _ in tokens_filtrados]))
+            comentarios_limpos.append(" ".join([lemma.lower() for lemma, _ in tokens_filtrados]))
     
         return tokens_resultado, comentarios_limpos
 
