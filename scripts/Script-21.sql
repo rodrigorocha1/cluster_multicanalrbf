@@ -56,7 +56,7 @@ create TABLE  param_ultima_data_busca(
 SELECT *
 FROM videos;
 
-truncate table videos
+
 
 select *
 FROM param_ultima_data_busca;
