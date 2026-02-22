@@ -24,6 +24,12 @@ class TratamentoSimples(ITratamento[str, str]):
         return re.sub(r"@\w+", "", comentario)
 
     @staticmethod
+    def __remover_risadas(comentario: str) -> str:
+
+        padrao = r'\b((k|h|a|u|e){2,}|(rs)+)\b'
+        return re.sub(padrao, '', comentario, flags=re.IGNORECASE)
+
+    @staticmethod
     def __remover_pontuacao(comentario: str) -> str:
         return re.sub(rf"[{re.escape(string.punctuation)}]", "", comentario)
 
@@ -40,6 +46,7 @@ class TratamentoSimples(ITratamento[str, str]):
         comentario = self.__remover_emoji(comentario)
         comentario = self.__remover_mencoes(comentario)
         comentario = self.__deixar_letras_minusculas(comentario)
+        comentario = self.__remover_risadas(comentario)
         comentario = self.__remover_pontuacao(comentario)
         comentario = self.__remover_acentos(comentario)
         comentario = re.sub(r"\s+", " ", comentario).strip()
