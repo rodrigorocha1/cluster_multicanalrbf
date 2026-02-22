@@ -96,6 +96,10 @@ class YoutubeAPI:
                     'requisicao': response
                 })
 
+                if len(response['items']) == 0:
+                    break
+
+
                 yield from response["items"]
                 next_page_token = response.get("nextPageToken")
                 if not next_page_token:
@@ -129,6 +133,9 @@ class YoutubeAPI:
                 )
 
                 response = request.execute()
+
+                if len(response['items']) == 0:
+                    break
 
                 yield from response.get("items", [])
                 logger.info(f'Sucesso ao pegar a resposta do comentário   {id_comentario}', extra={
