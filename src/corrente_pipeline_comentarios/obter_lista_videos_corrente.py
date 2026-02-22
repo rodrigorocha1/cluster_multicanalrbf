@@ -49,6 +49,7 @@ class ObterListaVideosCorrente(Corrente):
             id_canal in
             contexto.lista_canais
         ]
+        print(lista_id_videos)
 
         for dados_videos in chain.from_iterable(lista_id_videos):
             try:

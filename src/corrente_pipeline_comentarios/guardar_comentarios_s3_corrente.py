@@ -33,6 +33,7 @@ class GuardarComentariosS3Corrente(Corrente):
 
     def executar_processo(self, contexto: Contexto) -> bool:
         for comentario in contexto.lista_req_comentarios:
+            print('=' * 20, 'ínicio', '=' * 20)
 
             id_canal = comentario['snippet']['channelId']
             id_video = comentario['snippet']['videoId']
@@ -56,5 +57,5 @@ class GuardarComentariosS3Corrente(Corrente):
             contexto.lista_id_comentarios.append(
                 (id_canal, id_video, id_comentario)
             )
-
+            print('=' * 20, 'fim', '=' * 20)
         return True
