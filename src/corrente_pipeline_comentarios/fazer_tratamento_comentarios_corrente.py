@@ -1,11 +1,10 @@
+import numpy as np
 
 from src.contexto.contexto import Contexto
 from src.corrente_pipeline_comentarios.corrente import Corrente
 from src.servicos.banco.ioperacoes_banco import IoperacoesBanco
 from src.servicos.estrategia_tratamento.processador_texto import ProcessadorTexto
 from src.servicos.estrategia_tratamento.tratamento_simples import TratamentoSimples
-import numpy as np
-
 from src.servicos.estrategia_tratamento.tratamento_spacy import TratamentoSpacy
 
 
@@ -30,15 +29,16 @@ class FazerTratamentoComentariosCorrente(Corrente):
         base_original['comentario_limpo'] = comentarios_limpos
         base_original['embeddings'] = embeddings_list
 
-        df_copy = base_original.copy()
-
-        # Converte listas/tuplas em JSON ou string
         for col in ['tokens', 'entidades', 'embeddings']:
-            if col in df_copy.columns:
-                df_copy[col] = df_copy[col].apply(lambda x: str(x))
+            if col in base_original.columns:
+                base_original[col] = base_original[col].apply(lambda x: str(x))
 
-        print(df_copy.dtypes)
+        base_original['comentario_limpo'] = base_original['comentario_limpo'].replace(r'^\s*$', np.nan, regex=True)
 
-        self.__servico_banco_analitico.guardar_dados(df_copy)
+        base_original['comentario_limpo'] = base_original['comentario_limpo'].replace(['NaN', 'nan', 'None'], np.nan)
+
+        base_original = base_original.dropna(subset=['comentario_limpo'])
+
+        self.__servico_banco_analitico.guardar_dados(base_original)
 
         return True
