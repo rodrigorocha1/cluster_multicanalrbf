@@ -3,6 +3,7 @@ import numpy as np
 from src.contexto.contexto import Contexto
 from src.corrente_pipeline_comentarios.corrente import Corrente
 from src.servicos.banco.ioperacoes_banco import IoperacoesBanco
+from src.servicos.config.configuracao_log import logger
 from src.servicos.estrategia_tratamento.processador_texto import ProcessadorTexto
 from src.servicos.estrategia_tratamento.tratamento_simples import TratamentoSimples
 from src.servicos.estrategia_tratamento.tratamento_spacy import TratamentoSpacy
@@ -40,5 +41,10 @@ class FazerTratamentoComentariosCorrente(Corrente):
         base_original = base_original.dropna(subset=['comentario_limpo'])
 
         self.__servico_banco_analitico.guardar_dados(base_original)
+        logger.info(f'Sucesso ao guardar dados no banco', extra={
+            "descricao": "Guardar dados no banco",
+            "codigo": 200,
+            'requisicao': base_original
+        })
 
         return True
