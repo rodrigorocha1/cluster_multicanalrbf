@@ -19,8 +19,8 @@ from src.servicos.servico_s3.sevicos3 import ServicoS3
 contexto = Contexto(data_publicacao=datetime.now())
 caminho_banco = os.path.join(os.getcwd(), 'logs', 'logs.db')
 lista_canais = [
-    '@jogatinaepica', # x
-    # '@CKXgameplay',
+    # '@jogatinaepica', # x
+    '@CKXgameplay',
     # '@PalaDinXPG',
     # '@CanaldoVoid',
     # '@ChratosGameplay',

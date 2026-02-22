@@ -5,7 +5,6 @@ import pandas as pd
 
 from src.contexto.contexto import Contexto
 from src.corrente_pipeline_comentarios.corrente import Corrente
-from src.servicos.api_youtube.iapi_youtube import IApiYoutube
 from src.servicos.banco.ioperacoes_banco import IoperacoesBanco
 from src.servicos.config.configuracao_log import logger
 from src.servicos.servico_s3.iservicos3 import Iservicos3
@@ -25,8 +24,7 @@ class GuardarDadosYoutubeRespostaComentariosS3Corrente(Corrente):
         for dados in contexto.lista_req_resp_comentarios:
             for req_resposta_comentarios in dados[3]:
 
-
-                logger.info(f'Guardando json do canal {dados[0]}')
+                logger.info(f'Guardando json da resposta comentário do canal {dados[0]}')
                 id_resposta_comentarios = req_resposta_comentarios['id']
                 id_comentario = dados[2]
                 data_atualizacao_api = req_resposta_comentarios['snippet']['updatedAt']
@@ -43,12 +41,11 @@ class GuardarDadosYoutubeRespostaComentariosS3Corrente(Corrente):
                     dataframe = pd.DataFrame()
 
                 if dataframe.empty:
-                    logger.info(f'{id_comentario}  teve atualizacao')
+                    logger.info(f'Resposta comentário {id_comentario}  teve atualizacao')
                     caminho_arquivo = f"{self.__caminho_arquivo}/id_canal_{dados[0]}/id_video_{dados[1]}/id_comentario_{dados[2]}/resposta_comentarios.json"
 
                     self.__servico_s3.guardar_dados(req_resposta_comentarios, caminho_arquivo)
                 else:
-                    logger.info(f'{id_comentario} não teve atualizacao')
-
+                    logger.info(f' Resposta comentário {id_comentario} não teve atualizacao')
 
         return True

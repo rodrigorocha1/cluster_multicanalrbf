@@ -47,12 +47,12 @@ class GuardarComentariosS3Corrente(Corrente):
             except duckdb.IOException as e:
                 dataframe = pd.DataFrame()
             if dataframe.empty:
-                logger.info(f'Guardando resposta  comentários: {id_comentario} ')
+                logger.info(f'Guardando   comentários: {id_comentario} ')
 
                 caminho_completo = f"{self.__caminho_arquivo}/id_canal_{id_canal}/id_video_{id_video}/comentarios.json"
                 self.__servico_s3.guardar_dados(comentario, caminho_completo)
             else:
-                logger.info(f'Resposta comentários: {id_comentario} não teve atualizacao')
+                logger.info(f' comentário: {id_comentario} não teve atualizacao')
             contexto.lista_id_comentarios.append(
                 (id_canal, id_video, id_comentario)
             )
