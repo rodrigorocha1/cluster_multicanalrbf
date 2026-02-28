@@ -22,9 +22,11 @@ lista_canais = [
     # '@jogatinaepica', # x
     '@CKXgameplay',
     # '@PalaDinXPG',
+
     # '@CanaldoVoid',
     # '@ChratosGameplay',
     # '@LivesdoChratos',
+
     # '@cmdrleonerd',
     # '@BarbosaCities' #X 
 
