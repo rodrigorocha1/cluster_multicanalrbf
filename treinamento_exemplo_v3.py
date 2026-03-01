@@ -100,17 +100,42 @@ df["comentario"] = comentarios
 df["canal"] = canais
 df["cluster"] = KMeans(n_clusters=3, random_state=42).fit_predict(H_latente)
 
+
+wcss = []
+for i in range(1, 11):
+    kmeans_temp = KMeans(n_clusters=i, random_state=42)
+    kmeans_temp.fit(H_latente)
+    wcss.append(kmeans_temp.inertia_)
+
+# --- Gráfico WCSS ---
+fig_wcss = px.line(
+    x=list(range(1, 11)),
+    y=wcss,
+    markers=True,
+    title="Elbow Method - WCSS por número de clusters",
+    labels={"x": "Número de clusters", "y": "WCSS"}
+)
+fig_wcss.write_html('kmeans_comentarios.html')
+
+
 # A: t-SNE Interativo
 tsne = TSNE(n_components=2, perplexity=5, random_state=42)
 coords = tsne.fit_transform(H_latente)
 df["x"], df["y"] = coords[:, 0], coords[:, 1]
 
 fig = px.scatter(
-    df, x="x", y="y", color="canal", symbol="cluster",
-    hover_data=["comentario"], title="t-SNE: Ativações RBM (Espaço Latente)"
+    df,
+    x="x", y="y",
+    color="canal",
+    symbol="cluster",
+    hover_data=["comentario"],
+    title="t-SNE: Ativações RBM (Espaço Latente)",
+    template="plotly_dark"  # <<< modo dark ativado
 )
-fig.write_html("teste_rbm_interativo.html")
-print("Gráfico Plotly salvo: teste_rbm_interativo.html")
+
+# Salvar o HTML interativo
+fig.write_html("teste_rbm_interativo_dark.html")
+print("Gráfico Plotly (Dark Mode) salvo: teste_rbm_interativo_dark.html")
 
 # B: Heatmap de Especialistas
 plt.figure(figsize=(12, 6))
@@ -131,3 +156,24 @@ plt.show()
 print("\n=== RESUMO DOS NEURÓNIOS (CONCEITOS APRENDIDOS) ===")
 for h, palavras in top_words.items():
     print(f"h{h}: {', '.join(palavras)}")
+
+
+print("\n=== VALORES DOS NEURÔNIOS ESPECIALISTAS (CONCEITOS APRENDIDOS) ===")
+for h, palavras in top_words.items():
+    print(f"Neurônio h{h}: {', '.join(palavras[:10])}")  # Mostrando até 10 palavras mais influentes
+
+
+# Criar DataFrame detalhado com comentários e valores dos neurônios
+df_detalhado = pd.DataFrame(H_latente, columns=[f"h{i}" for i in range(n_ocultos)])
+df_detalhado["comentario"] = comentarios
+df_detalhado["canal"] = canais
+df_detalhado["cluster"] = KMeans(n_clusters=3, random_state=42).fit_predict(H_latente)
+# Exibir todas as colunas e linhas
+pd.set_option('display.max_columns', None)   # mostra todas as colunas
+pd.set_option('display.max_rows', None)      # mostra todas as linhas
+pd.set_option('display.width', 300)          # largura máxima do display
+pd.set_option('display.precision', 2)        # casas decimais para float
+pd.set_option('display.colheader_justify', 'center')  # centralizar cabeçalho
+
+# Exibir os 10 primeiros para conferência
+print(df_detalhado.head(10))
