@@ -27,9 +27,7 @@ from servicos.modelo.rmb_youtube import RBMYoutube
 from src.servicos.banco.operacoes_banco import OperacoesBancoDuckDb
 
 
-# -----------------------------
-# Configuração MLflow
-# -----------------------------
+
 def configurar_mlflow(tracking_uri: str, experiment_name: str):
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment(experiment_name)
@@ -39,9 +37,7 @@ def configurar_mlflow(tracking_uri: str, experiment_name: str):
 configurar_mlflow("http://localhost:5000", experiment_name="RBM_Youtube_Cluster")
 
 
-# -----------------------------
-# Leitura e preparação dos dados
-# -----------------------------
+
 obddb = OperacoesBancoDuckDb()
 caminho_consulta = "s3://extracao/prata/comentarios_youtube_prata_2026_02_22_14_43_29.csv"
 df_original = obddb.consultar_dados(id_consulta='1=1', caminho_consulta=caminho_consulta).drop_duplicates()
@@ -52,9 +48,7 @@ embeddings_normalizados = scaler.fit_transform(embeddings_array)
 dados_tensor = torch.tensor(embeddings_normalizados, dtype=torch.float32)
 
 
-# -----------------------------
-# Treinamento RBM
-# -----------------------------
+
 n_visiveis = dados_tensor.shape[1]
 n_ocultos = 16
 epocas = 100
@@ -66,22 +60,12 @@ rbm.treinar(dados_tensor, epocas=epocas, taxa_aprendizado=taxa_aprendizado, tama
 ativacoes_latentes = rbm.transformar_latente(dados_tensor).detach().numpy()
 
 
-# -----------------------------
-# Funções utilitárias
-# -----------------------------
+#
 
 from sklearn.feature_extraction.text import CountVectorizer
 
 def log_ngrams(clusters, df, prefixo="kmeans", ngram_range=(2, 3), top_n=15):
-    """
-    Captura n-grams por cluster e registra no MLflow como JSON.
 
-    :param clusters: array/lista de labels do cluster
-    :param df: dataframe com coluna 'texto_comentario'
-    :param prefixo: prefixo para nome do artefato MLflow
-    :param ngram_range: range de n-grams, ex: (2,2) = bigrams, (2,3)=bi+tri grams
-    :param top_n: número de n-grams top por cluster
-    """
     pt_stopwords = [
         'de','a','o','que','e','do','da','em','um','para','é','com','não','uma','os','no','se','na',
         'por','mais','as','dos','como','mas','foi','ao','ele','das','tem','à','seu','sua','ou','ser',
@@ -191,9 +175,6 @@ def log_top_terms(clusters, df, prefixo="kmeans", top_n=15):
 input_example = embeddings_normalizados[:1].astype(np.float32)
 
 
-# -----------------------------
-# KMEANS
-# -----------------------------
 n_clusters_kmeans = 4
 with mlflow.start_run(run_name="RBM_KMeans") as run_kmeans:
     # Parâmetros MLflow
@@ -232,9 +213,20 @@ with mlflow.start_run(run_name="RBM_KMeans") as run_kmeans:
         "comentario": df_original["texto_comentario"]
     })
     df_viz.to_csv('df_viz.csv', sep='|')
-    fig = px.scatter(df_viz, x="tsne_1", y="tsne_2", color="cluster_kmeans",
-                     symbol="id_canal", hover_data=["comentario", "id_canal"],
-                     title="Clusterização KMeans")
+
+    paleta_cores = ["#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A", "#19D3F3"]
+
+    fig = px.scatter(
+        df_viz,
+        x="tsne_1",
+        y="tsne_2",
+        color="cluster_kmeans",
+        symbol="id_canal",
+        hover_data=["comentario", "id_canal"],
+        title="Clusterização KMeans",
+        color_discrete_sequence=paleta_cores,
+        template="plotly_dark"  # modo dark
+    )
 
     fig.update_layout(showlegend=False, coloraxis_showscale=False)
 
@@ -246,7 +238,7 @@ with mlflow.start_run(run_name="RBM_KMeans") as run_kmeans:
 
     # Logs de clusters e WordClouds
     log_cluster_counts(clusters, "kmeans_cluster_counts.json")
-    log_wordclouds(clusters, df_original, prefixo="kmeans")
+    # log_wordclouds(clusters, df_original, prefixo="kmeans")
     log_top_terms(clusters, df_original, prefixo="kmeans")
     top_ngrams_kmeans = log_ngrams(clusters, df_original, prefixo="kmeans", ngram_range=(2, 3), top_n=20)
 
@@ -325,7 +317,7 @@ with mlflow.start_run(run_name="RBM_HDBSCAN") as run_hdbscan:
 
     # Logs de clusters e WordClouds
     log_cluster_counts(clusters_hdbscan, "hdbscan_cluster_counts.json")
-    log_wordclouds(clusters_hdbscan, df_original, prefixo="hdbscan")
+    # log_wordclouds(clusters_hdbscan, df_original, prefixo="hdbscan")
     log_top_terms(clusters_hdbscan, df_original, prefixo="hdbscan")
     top_ngrams_hdbscan = log_ngrams(clusters_hdbscan, df_original, prefixo="hdbscan", ngram_range=(2, 3), top_n=20)
 
