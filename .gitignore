@@ -4,3 +4,9 @@ minio-data
 *#
 pgdata/*
 /logs/logs.db
+/fig_64/pca_tsne.html
+/fig_64/umap_dimensionalidade.html
+/ativacoes_rbm.json
+/comentarios_ativacoes_rbm.json
+/comentarios_clusters_rbm.json
+/df_viz.csv
