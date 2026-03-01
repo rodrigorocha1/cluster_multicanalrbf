@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from src.servicos.banco.ioperacoes_banco import IoperacoesBanco, T
 from src.servicos.config.config import Config
-
+import os
 
 class OperacoesBancoDuckDb(IoperacoesBanco[pd.DataFrame, pd.DataFrame]):
 
@@ -25,17 +25,25 @@ class OperacoesBancoDuckDb(IoperacoesBanco[pd.DataFrame, pd.DataFrame]):
         self.__caminho_s3_prata = f's3://extracao/prata/comentarios_youtube_prata_{self.__data_arquivo}.csv'
 
     def consultar_dados(self, id_consulta: str, caminho_consulta: str) -> pd.DataFrame:
+        extensao = os.path.splitext(caminho_consulta)[1].lower()
+        print(f"Extensão do arquivo: {extensao}")
+
+        if extensao == ".json":
+            reader = "read_json_auto(?)"
+        elif extensao == ".csv":
+            reader = "read_csv_auto(?)"
+        else:
+            raise ValueError(f"Formato não suportado: {extensao}")
+
         query = f"""
             SELECT *
-            FROM read_json_auto(?)
+            FROM {reader}
             WHERE {id_consulta}
         """
 
-        # Apenas caminho_consulta como parâmetro
         result = self.__con.execute(query, [caminho_consulta])
         df = result.fetchdf()
         return df
-
     def guardar_dados(self, dados: pd.DataFrame):
         self.__con.register('df_temp', dados)
         self.__con.execute(f'COPY df_temp TO "{self.__caminho_s3_prata}" (FORMAT CSV, HEADER TRUE,  DELIMITER ";")')
