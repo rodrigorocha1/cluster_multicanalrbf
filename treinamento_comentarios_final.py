@@ -69,12 +69,58 @@ ativacoes_latentes = rbm.transformar_latente(dados_tensor).detach().numpy()
 # -----------------------------
 # Funções utilitárias
 # -----------------------------
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+def log_ngrams(clusters, df, prefixo="kmeans", ngram_range=(2, 3), top_n=15):
+    """
+    Captura n-grams por cluster e registra no MLflow como JSON.
+
+    :param clusters: array/lista de labels do cluster
+    :param df: dataframe com coluna 'texto_comentario'
+    :param prefixo: prefixo para nome do artefato MLflow
+    :param ngram_range: range de n-grams, ex: (2,2) = bigrams, (2,3)=bi+tri grams
+    :param top_n: número de n-grams top por cluster
+    """
+    pt_stopwords = [
+        'de','a','o','que','e','do','da','em','um','para','é','com','não','uma','os','no','se','na',
+        'por','mais','as','dos','como','mas','foi','ao','ele','das','tem','à','seu','sua','ou','ser',
+        'quando','muito','há','nos','já','está','eu','também','só','pelo','pela','até','isso','ela',
+        'entre','era','depois','sem','mesmo','aos','ter','seus','quem','nas','me','esse','eles','estão',
+        'você','tinha','foram','essa','num','nem','suas','meu','às','minha','têm','numa','pelos','elas'
+    ]
+
+    ngrams_dict = {}
+
+    for cluster_id in set(clusters):
+        if cluster_id == -1:
+            continue
+        textos = df.loc[clusters == cluster_id, "texto_comentario"].dropna().tolist()
+        if not textos:
+            continue
+
+        vectorizer = CountVectorizer(stop_words=pt_stopwords, ngram_range=ngram_range, max_features=top_n)
+        try:
+            X = vectorizer.fit_transform(textos)
+            sum_counts = X.sum(axis=0)
+            ngram_freq = [(ngram, sum_counts[0, idx]) for ngram, idx in vectorizer.vocabulary_.items()]
+            ngram_freq = sorted(ngram_freq, key=lambda x: x[1], reverse=True)
+            top_ngrams = [ng[0] for ng in ngram_freq]
+            ngrams_dict[f"cluster_{cluster_id}"] = top_ngrams
+        except Exception as e:
+            ngrams_dict[f"cluster_{cluster_id}"] = ["erro_na_extracao"]
+
+    # Registrar no MLflow
+    mlflow.log_dict(ngrams_dict, f"ngrams/{prefixo}_top_ngrams.json")
+    return ngrams_dict
+
+
 def log_cluster_counts(clusters, nome_arquivo):
     contagem = {int(k): int(v) for k, v in Counter(clusters).items()}
     mlflow.log_dict(contagem, nome_arquivo)
 
 
-def log_wordclouds(clusters, df, prefix="kmeans"):
+def log_wordclouds(clusters, df, prefixo="kmeans"):
     for cluster_id in set(clusters):
         if cluster_id == -1:
             continue
@@ -87,11 +133,11 @@ def log_wordclouds(clusters, df, prefix="kmeans"):
         buffer.seek(0)
         img_b64 = base64.b64encode(buffer.read()).decode("utf-8")
         html_content = f'<img src="data:image/png;base64,{img_b64}"/>'
-        mlflow.log_text(html_content, artifact_file=f"visualizacoes/wordclouds_{prefix}/cluster_{cluster_id}.html")
+        mlflow.log_text(html_content, artifact_file=f"visualizacoes/wordclouds_{prefixo}/cluster_{cluster_id}.html")
         buffer.close()
 
 
-def log_top_terms(clusters, df, prefix="kmeans", top_n=15):
+def log_top_terms(clusters, df, prefixo="kmeans", top_n=15):
     pt_stopwords = [
         'de', 'a', 'o', 'que', 'e', 'do', 'da', 'em', 'um', 'para', 'é', 'com', 'não', 'uma', 'os', 'no', 'se', 'na',
         'por', 'mais', 'as', 'dos', 'como', 'mas', 'foi', 'ao', 'ele', 'das', 'tem', 'à', 'seu', 'sua', 'ou', 'ser',
@@ -136,7 +182,7 @@ def log_top_terms(clusters, df, prefix="kmeans", top_n=15):
             top_termos_dict[f"cluster_{cluster_id}"] = ["erro_na_extracao"]
 
     # Registra no MLflow como um JSON
-    mlflow.log_dict(top_termos_dict, f"termos/{prefix}_top_termos.json")
+    mlflow.log_dict(top_termos_dict, f"termos/{prefixo}_top_termos.json")
     return top_termos_dict
 
 # -----------------------------
@@ -200,8 +246,9 @@ with mlflow.start_run(run_name="RBM_KMeans") as run_kmeans:
 
     # Logs de clusters e WordClouds
     log_cluster_counts(clusters, "kmeans_cluster_counts.json")
-    log_wordclouds(clusters, df_original, prefix="kmeans")
-    log_top_terms(clusters, df_original, prefix="kmeans")
+    log_wordclouds(clusters, df_original, prefixo="kmeans")
+    log_top_terms(clusters, df_original, prefixo="kmeans")
+    top_ngrams_kmeans = log_ngrams(clusters, df_original, prefixo="kmeans", ngram_range=(2, 3), top_n=20)
 
     # Registrar modelo RBM no MLflow PyTorch
     mlflow.pytorch.log_model(
@@ -278,8 +325,9 @@ with mlflow.start_run(run_name="RBM_HDBSCAN") as run_hdbscan:
 
     # Logs de clusters e WordClouds
     log_cluster_counts(clusters_hdbscan, "hdbscan_cluster_counts.json")
-    log_wordclouds(clusters_hdbscan, df_original, prefix="hdbscan")
-    log_top_terms(clusters_hdbscan, df_original, prefix="hdbscan")
+    log_wordclouds(clusters_hdbscan, df_original, prefixo="hdbscan")
+    log_top_terms(clusters_hdbscan, df_original, prefixo="hdbscan")
+    top_ngrams_hdbscan = log_ngrams(clusters_hdbscan, df_original, prefixo="hdbscan", ngram_range=(2, 3), top_n=20)
 
     # Registrar modelo RBM no MLflow PyTorch
     mlflow.pytorch.log_model(
