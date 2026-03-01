@@ -1,6 +1,3 @@
-# -----------------------------
-# Script completo: RBM + Clustering + MLflow
-# -----------------------------
 
 import ast
 import base64
@@ -15,7 +12,9 @@ import mlflow.pytorch
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import seaborn as sns
 import torch
+from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.cluster._hdbscan import hdbscan
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -161,6 +160,13 @@ with mlflow.start_run(run_name="RBM_KMeans") as run_kmeans:
         "n_clusters_kmeans": n_clusters_kmeans
     })
 
+    comentarios = df_original["texto_comentario"].tolist()
+    dados_json = [{"comentario": c, "ativacoes_latentes": l.tolist()} for c, l in zip(comentarios, ativacoes_latentes)]
+    json_buffer = io.StringIO()
+    json.dump(dados_json, json_buffer, ensure_ascii=False, indent=2)
+    json_buffer.seek(0)
+    mlflow.log_text(json_buffer.getvalue(), artifact_file="embeddings_latentes/comentarios_ativacoes_rbm.json")
+    json_buffer.close()
     # pca = PCA(n_components=n_componentes, random_state=42)
     # ativacoes_pca = pca.fit_transform(ativacoes_latentes)
 
