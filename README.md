@@ -11,6 +11,7 @@
 
 ## Tecnologias Utilizadas
 - 🐍 Python (PyTorch, Scikit-learn, SpaCy, NumPy, Pandas)
+- 🧠 SpaCy para processamento de linguagem natural
 - ⚡ Boltzmann Machines para extração de representações latentes
 - 📊 MLflow para registro de experimentos, métricas e artefatos
 - ☁️ MinIO (S3) para armazenamento de datasets e modelos
