@@ -202,7 +202,6 @@ with mlflow.start_run(run_name="RBM_KMeans") as run_kmeans:
     score_silhouette = silhouette_score(ativacoes_latentes, clusters)
     mlflow.log_metric("silhouette_score", score_silhouette)
 
-    # t-SNE
     tsne = TSNE(n_components=2, random_state=42, init="pca")
     coords_tsne = tsne.fit_transform(ativacoes_latentes)
     df_viz = pd.DataFrame({
@@ -214,22 +213,29 @@ with mlflow.start_run(run_name="RBM_KMeans") as run_kmeans:
     })
     df_viz.to_csv('df_viz.csv', sep='|')
 
+    df_viz["cluster_kmeans_str"] = df_viz["cluster_kmeans"].astype(str)
+
+
     paleta_cores = ["#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A", "#19D3F3"]
 
     fig = px.scatter(
         df_viz,
         x="tsne_1",
         y="tsne_2",
-        color="cluster_kmeans",
+        color="cluster_kmeans_str",  # usamos a versão string
         symbol="id_canal",
         hover_data=["comentario", "id_canal"],
         title="Clusterização KMeans",
         color_discrete_sequence=paleta_cores,
-        template="plotly_dark"  # modo dark
+        template="plotly_dark"
     )
 
-    fig.update_layout(showlegend=False, coloraxis_showscale=False)
+    fig.update_layout(
+        showlegend=False,
+        coloraxis_showscale=False
+    )
 
+    # Salvar no MLflow
     html_buffer = io.StringIO()
     fig.write_html(html_buffer)
     html_buffer.seek(0)
