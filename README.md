@@ -27,7 +27,7 @@
 
 4- Experimentos com Mlflow: Registrar: hiperparâmetros RBM (n_hidden, learning_rate), clustering (n_clusters, algoritmo), métricas (Silhouette, Calinski-Harabasz) e salvar gráficos, embeddings e artefatos no MinIO via Mlflow.
 
-5 -  Clustering: K-Means / DBSCAN / HDBSCAN sobre embeddings latentes, Salvar labels e embeddings finais no MinIO e Registrar métricas de clusterização no Mlflow.
+5 -  Clustering: K-Means  sobre embeddings latentes, Salvar labels e embeddings finais no MinIO e Registrar métricas de clusterização no Mlflow.
 
 6 - Interpretação de Clusters: Extração de comentários representativos, palavras-chave top-n por cluster. ags emergentes podem ser usadas para auto-tagging futuro .
 
